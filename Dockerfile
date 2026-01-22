@@ -1,18 +1,19 @@
-FROM eclipse-temurin:17-jdk AS build
-WORKDIR /app
-COPY mvnw mvnw
-COPY mvnw.cmd mvnw.cmd
-COPY .mvn .mvn
-COPY pom.xml pom.xml
-RUN ./mvnw -q -DskipTests dependency:go-offline
-COPY src src
-COPY category category
-RUN ./mvnw -q -DskipTests clean package
+# syntax=docker/dockerfile:1
 
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+
+COPY pom.xml .
+COPY category ./category
+COPY src ./src
+
+RUN mvn -DskipTests clean package
 
 FROM eclipse-temurin:17-jre
 WORKDIR /app
-ENV PORT=8080
-COPY --from=build /app/target/*.jar /app/app.jar
+
+# Render injeta PORT em runtime; a app já usa server.port=${PORT:8080}
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+COPY --from=build /app/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
