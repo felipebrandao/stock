@@ -7,8 +7,10 @@ import br.com.felipebrandao.stock.nfce.domain.repository.NfceImportRepository;
 import br.com.felipebrandao.stock.nfce.infrastructure.persistence.service.NfceScrapePersistenceService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProcessNfceImportUseCase {
@@ -19,17 +21,25 @@ public class ProcessNfceImportUseCase {
 
     @Transactional
     public void execute(NfceImport nfceImport) {
-
+        long start = System.currentTimeMillis();
+        String qr = nfceImport.getQrCodeUrl();
         try {
-            ScrapedNfceData data = scraperClient.scrape(nfceImport.getQrCodeUrl());
+            log.info("[nfce-import] Iniciando processamento da importação NFC-e. qrCodeUrl={}", qr);
+
+            ScrapedNfceData data = scraperClient.scrape(qr);
 
             scrapePersistenceService.save(data);
 
             nfceImport.markCompleted();
             repository.save(nfceImport);
+
+            long duration = System.currentTimeMillis() - start;
+            log.info("[nfce-import] Importação NFC-e processada com sucesso. qrCodeUrl={} durationMs={}", qr, duration);
         } catch (Exception ex) {
             nfceImport.markFailed(ex.getMessage());
             repository.save(nfceImport);
+            long duration = System.currentTimeMillis() - start;
+            log.error("[nfce-import] Erro ao processar importação NFC-e. qrCodeUrl={} after {} ms", qr, duration, ex);
         }
     }
 }

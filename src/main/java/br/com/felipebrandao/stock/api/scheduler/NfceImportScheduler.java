@@ -13,13 +13,17 @@ public class NfceImportScheduler {
 
     private final ProcessPendingNfceImportsUseCase processPendingNfceImportsUseCase;
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelay = 10000)
     public void processPendingImports() {
+        long start = System.currentTimeMillis();
         try {
-            log.debug("[scheduler] Processando importações NFC-e pendentes...");
+            log.info("[scheduler] Iniciando processamento de importações NFC-e pendentes...");
             processPendingNfceImportsUseCase.execute();
+            long duration = System.currentTimeMillis() - start;
+            log.info("[scheduler] Processamento de importações NFC-e pendentes concluído com sucesso em {} ms.", duration);
         } catch (Exception e) {
-            log.error("[scheduler] Erro ao processar importações NFC-e pendentes", e);
+            long duration = System.currentTimeMillis() - start;
+            log.error("[scheduler] Erro ao processar importações NFC-e pendentes após {} ms", duration, e);
         }
     }
 }
