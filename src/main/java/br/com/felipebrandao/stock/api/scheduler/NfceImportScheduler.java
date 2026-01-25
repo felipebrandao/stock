@@ -3,6 +3,7 @@ package br.com.felipebrandao.stock.api.scheduler;
 import br.com.felipebrandao.stock.nfce.application.usecase.ProcessPendingNfceImportsUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,10 @@ public class NfceImportScheduler {
 
     private final ProcessPendingNfceImportsUseCase processPendingNfceImportsUseCase;
 
-    @Scheduled(fixedDelay = 10000)
+    @Value("${scheduler.nfce.import.fixedDelayMs:300000}")
+    private long fixedDelayMs;
+
+    @Scheduled(fixedDelayString = "${scheduler.nfce.import.fixedDelayMs:300000}")
     public void processPendingImports() {
         long start = System.currentTimeMillis();
         try {

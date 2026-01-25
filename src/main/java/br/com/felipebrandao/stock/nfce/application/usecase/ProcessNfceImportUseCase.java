@@ -19,7 +19,7 @@ public class ProcessNfceImportUseCase {
     private final NfceScraperClient scraperClient;
     private final NfceScrapePersistenceService scrapePersistenceService;
 
-    @Transactional
+
     public void execute(NfceImport nfceImport) {
         long start = System.currentTimeMillis();
         String qr = nfceImport.getQrCodeUrl();
@@ -28,18 +28,27 @@ public class ProcessNfceImportUseCase {
 
             ScrapedNfceData data = scraperClient.scrape(qr);
 
-            scrapePersistenceService.save(data);
-
-            nfceImport.markCompleted();
-            repository.save(nfceImport);
+            persistSuccess(nfceImport, data);
 
             long duration = System.currentTimeMillis() - start;
             log.info("[nfce-import] Importação NFC-e processada com sucesso. qrCodeUrl={} durationMs={}", qr, duration);
         } catch (Exception ex) {
-            nfceImport.markFailed(ex.getMessage());
-            repository.save(nfceImport);
+            persistFailure(nfceImport, ex.getMessage());
             long duration = System.currentTimeMillis() - start;
             log.error("[nfce-import] Erro ao processar importação NFC-e. qrCodeUrl={} after {} ms", qr, duration, ex);
         }
+    }
+
+    @Transactional
+    protected void persistSuccess(NfceImport nfceImport, ScrapedNfceData data) {
+        scrapePersistenceService.save(data);
+        nfceImport.markCompleted();
+        repository.save(nfceImport);
+    }
+
+    @Transactional
+    protected void persistFailure(NfceImport nfceImport, String errorMessage) {
+        nfceImport.markFailed(errorMessage);
+        repository.save(nfceImport);
     }
 }

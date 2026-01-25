@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
         name = "nfce-scraper",
-        url = "${nfce.scraper.url}"
+        url = "${nfce.scraper.url}",
+        configuration = br.com.felipebrandao.stock.nfce.infrastructure.config.FeignConfig.class
 )
 public interface NfceScraperFeignClient {
 
