@@ -11,19 +11,20 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class FeignConfig {
 
-    @Value("${feign.connect.timeout:5000}")
+    @Value("${feign.connect.timeout:10000}")
     private int connectTimeout;
 
-    @Value("${feign.read.timeout:900000}")
+    @Value("${feign.read.timeout:900000}") // 15 minutos
     private int readTimeout;
 
     @Bean
     public Retryer retryer() {
-        return new Retryer.Default(1000L, TimeUnit.SECONDS.toMillis(10), 3);
+        // período inicial: 5 segundos, período máximo: 30 segundos, 3 tentativas
+        return new LoggingRetryer(5000L, 30000L, 3);
     }
 
     @Bean
     public Request.Options feignOptions() {
-        return new Request.Options(connectTimeout, readTimeout);
+        return new Request.Options(connectTimeout, TimeUnit.MILLISECONDS, readTimeout, TimeUnit.MILLISECONDS, true);
     }
 }

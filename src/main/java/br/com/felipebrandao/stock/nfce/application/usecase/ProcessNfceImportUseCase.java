@@ -26,7 +26,11 @@ public class ProcessNfceImportUseCase {
         try {
             log.info("[nfce-import] Iniciando processamento da importação NFC-e. qrCodeUrl={}", qr);
 
+            log.info("[nfce-import] Chamando scraper para qrCodeUrl={}", qr);
+            long scraperStart = System.currentTimeMillis();
             ScrapedNfceData data = scraperClient.scrape(qr);
+            long scraperDuration = System.currentTimeMillis() - scraperStart;
+            log.info("[nfce-import] Scraper concluído com sucesso em {} ms para qrCodeUrl={}", scraperDuration, qr);
 
             persistSuccess(nfceImport, data);
 
