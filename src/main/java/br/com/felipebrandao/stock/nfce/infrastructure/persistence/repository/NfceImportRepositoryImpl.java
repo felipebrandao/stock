@@ -1,10 +1,12 @@
 package br.com.felipebrandao.stock.nfce.infrastructure.persistence.repository;
 
 import br.com.felipebrandao.stock.nfce.domain.model.NfceImport;
+import br.com.felipebrandao.stock.nfce.domain.model.enums.NfceStatus;
 import br.com.felipebrandao.stock.nfce.domain.repository.NfceImportRepository;
 import br.com.felipebrandao.stock.nfce.infrastructure.persistence.entity.NfceImportEntity;
 import br.com.felipebrandao.stock.nfce.infrastructure.persistence.mapper.NfceImportMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -36,6 +38,30 @@ public class NfceImportRepositoryImpl implements NfceImportRepository {
     public Optional<NfceImport> findById(UUID id) {
         return jpaRepository.findById(id)
                 .map(mapper::toDomain);
+    }
+
+    @Override
+    public List<NfceImport> findAllPaginated(int page, int size) {
+        return jpaRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size))
+                .map(mapper::toDomain)
+                .getContent();
+    }
+
+    @Override
+    public List<NfceImport> findByStatusPaginated(NfceStatus status, int page, int size) {
+        return jpaRepository.findByStatusOrderByCreatedAtDesc(status, PageRequest.of(page, size))
+                .map(mapper::toDomain)
+                .getContent();
+    }
+
+    @Override
+    public long count() {
+        return jpaRepository.count();
+    }
+
+    @Override
+    public long countByStatus(NfceStatus status) {
+        return jpaRepository.countByStatus(status);
     }
 
 }
