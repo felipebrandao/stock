@@ -35,11 +35,11 @@ public class ProcessNfceImportUseCase {
             persistSuccess(nfceImport, data);
 
             long duration = System.currentTimeMillis() - start;
-            log.info("[nfce-import] Importação NFC-e processada com sucesso. qrCodeUrl={} durationMs={}", qr, duration);
+            log.info("[nfce-import] Importação NFC-e processada com sucesso. qrCodeUrl={} duracaoMs={}", qr, duration);
         } catch (Exception ex) {
             persistFailure(nfceImport, ex.getMessage());
             long duration = System.currentTimeMillis() - start;
-            log.error("[nfce-import] Erro ao processar importação NFC-e. qrCodeUrl={} after {} ms", qr, duration, ex);
+            log.error("[nfce-import] Erro ao processar importação NFC-e. qrCodeUrl={} após {} ms", qr, duration, ex);
         }
     }
 

@@ -20,7 +20,7 @@ public class NfceImportStatusUpdater {
         nfceImport.markProcessing();
         repository.save(nfceImport);
 
-        log.info("[async-processor] Status atualizado para PROCESSING. id={} attempts={}",
+        log.info("[async-processor] Status atualizado para PROCESSING. id={} tentativas={}",
                 nfceImport.getId(), nfceImport.getAttempts());
     }
 }

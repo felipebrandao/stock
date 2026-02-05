@@ -21,7 +21,7 @@ public class AsyncConfig {
         executor.setQueueCapacity(100);
         executor.setThreadNamePrefix("nfce-import-");
         executor.setRejectedExecutionHandler((r, exec) -> {
-            log.error("[async] Task rejected from executor. Queue is full.");
+            log.error("[async] Tarefa rejeitada pelo executor. Fila cheia.");
         });
         executor.initialize();
         return executor;
