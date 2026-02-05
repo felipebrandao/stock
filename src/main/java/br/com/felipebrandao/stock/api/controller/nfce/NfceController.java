@@ -11,6 +11,7 @@ import br.com.felipebrandao.stock.nfce.application.usecase.ApproveNfceImportUseC
 import br.com.felipebrandao.stock.nfce.application.usecase.GetNfceHistoryUseCase;
 import br.com.felipebrandao.stock.nfce.application.usecase.GetNfceImportReviewUseCase;
 import br.com.felipebrandao.stock.nfce.application.usecase.ImportNfceUseCase;
+import br.com.felipebrandao.stock.nfce.application.usecase.RetryNfceImportUseCase;
 import br.com.felipebrandao.stock.nfce.application.usecase.UpdateNfceImportReviewUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,7 @@ public class NfceController {
     private final UpdateNfceImportReviewUseCase updateNfceImportReviewUseCase;
     private final ApproveNfceImportUseCase approveNfceImportUseCase;
     private final GetNfceHistoryUseCase getNfceHistoryUseCase;
+    private final RetryNfceImportUseCase retryNfceImportUseCase;
 
     @PostMapping("/import")
     public ResponseEntity<NfceResponse> importNfce(
@@ -104,6 +106,12 @@ public class NfceController {
     public ResponseEntity<Void> approveImport(@PathVariable("id") UUID id) {
         approveNfceImportUseCase.execute(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/imports/{id}/retry")
+    public ResponseEntity<Void> retryImport(@PathVariable("id") UUID id) {
+        retryNfceImportUseCase.execute(id);
+        return ResponseEntity.accepted().build();
     }
 
     @GetMapping("/history")

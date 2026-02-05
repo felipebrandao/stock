@@ -1,25 +1,28 @@
 package br.com.felipebrandao.stock.nfce.application.usecase;
 
+import br.com.felipebrandao.stock.nfce.application.service.AsyncNfceImportProcessorService;
 import br.com.felipebrandao.stock.nfce.domain.model.NfceImport;
 import br.com.felipebrandao.stock.nfce.domain.repository.NfceImportRepository;
 import br.com.felipebrandao.stock.shared.exception.BusinessException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImportNfceUseCase {
 
     private final NfceImportRepository repository;
+    private final AsyncNfceImportProcessorService asyncProcessor;
 
     private static final Pattern ACCESS_KEY_PATTERN = Pattern.compile("\\b\\d{44}\\b");
 
-    @Transactional
     public UUID execute(String qrCodeUrl) {
 
         String accessKey = extractAccessKey(qrCodeUrl);
@@ -29,6 +32,18 @@ public class ImportNfceUseCase {
                 accessKey
         );
 
+        UUID importId = saveImport(importJob);
+
+        log.info("[import-nfce] Importação criada com sucesso. id={} accessKey={}", importId, accessKey);
+
+        asyncProcessor.processAsync(importId);
+        log.info("[import-nfce] Processamento assíncrono disparado para id={}", importId);
+
+        return importId;
+    }
+
+    @Transactional
+    protected UUID saveImport(NfceImport importJob) {
         NfceImport saved = repository.save(importJob);
 
         return saved.getId();

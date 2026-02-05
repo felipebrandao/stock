@@ -15,11 +15,6 @@ public interface NfceImportJpaRepository extends JpaRepository<NfceImportEntity,
 
     Optional<NfceImportEntity> findByAccessKey(String accessKey);
 
-    @Query(value = "SELECT n " +
-            "FROM NfceImportEntity n " +
-            "WHERE n.status = 'PENDING' " +
-            "ORDER BY n.createdAt ASC")
-    List<NfceImportEntity> findNextPending(int limit);
 
     Page<NfceImportEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 

@@ -27,12 +27,6 @@ public class NfceImportRepositoryImpl implements NfceImportRepository {
         return mapper.toDomain(saved);
     }
 
-    @Override
-    public List<NfceImport> findNextPending(int limit) {
-        return jpaRepository.findNextPending(limit).stream()
-                .map(mapper::toDomain)
-                .toList();
-    }
 
     @Override
     public Optional<NfceImport> findById(UUID id) {

@@ -43,6 +43,9 @@ public class NfceImportEntity {
     @Column(name = "error_message", length = 1000)
     private String errorMessage;
 
+    @Column(name = "attempts", nullable = false)
+    private Integer attempts;
+
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 

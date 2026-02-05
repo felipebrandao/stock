@@ -10,7 +10,6 @@ import java.util.UUID;
 public interface NfceImportRepository {
 
     NfceImport save(NfceImport importJob);
-    List<NfceImport> findNextPending(int limit);
     Optional<NfceImport> findById(UUID id);
 
     List<NfceImport> findAllPaginated(int page, int size);

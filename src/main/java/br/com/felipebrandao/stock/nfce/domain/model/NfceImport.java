@@ -18,6 +18,7 @@ public class NfceImport {
     private Instant createdAt;
     private Instant updatedAt;
     private String errorMessage;
+    private Integer attempts;
 
     public static NfceImport createPending(String qrCodeUrl, String accessKey) {
 
@@ -28,7 +29,8 @@ public class NfceImport {
                 NfceStatus.PENDING,
                 Instant.now(),
                 null,
-                null
+                null,
+                0
         );
     }
 
@@ -46,5 +48,9 @@ public class NfceImport {
         this.status = NfceStatus.ERROR;
         this.errorMessage = reason;
         this.updatedAt = Instant.now();
+    }
+
+    public void incrementAttempts() {
+        this.attempts = (this.attempts == null ? 0 : this.attempts) + 1;
     }
 }
