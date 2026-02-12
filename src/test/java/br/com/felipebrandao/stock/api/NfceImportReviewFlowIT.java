@@ -6,8 +6,13 @@ import br.com.felipebrandao.stock.api.controller.nfce.dto.request.UpdateNfceImpo
 import br.com.felipebrandao.stock.api.controller.nfce.dto.request.UpdateNfceImportReviewRequest;
 import br.com.felipebrandao.stock.api.controller.product.dto.request.CreateProductRequest;
 import br.com.felipebrandao.stock.nfce.domain.model.enums.NfceStatus;
+import br.com.felipebrandao.stock.nfce.infrastructure.persistence.entity.NfceImportEntity;
+import br.com.felipebrandao.stock.nfce.infrastructure.persistence.entity.NfceScrapeEntity;
+import br.com.felipebrandao.stock.nfce.infrastructure.persistence.entity.NfceScrapeItemEntity;
 import br.com.felipebrandao.stock.nfce.infrastructure.persistence.repository.NfceImportJpaRepository;
 import br.com.felipebrandao.stock.nfce.infrastructure.persistence.repository.NfceScrapeJpaRepository;
+import br.com.felipebrandao.stock.product.infrastructure.persistence.entity.ProductAliasEntity;
+import br.com.felipebrandao.stock.product.infrastructure.persistence.entity.ProductEntity;
 import br.com.felipebrandao.stock.product.infrastructure.persistence.repository.ProductAliasJpaRepository;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -24,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -105,7 +111,7 @@ class NfceImportReviewFlowIT {
                 .body("message", containsString("não pode ser editada"));
 
         var saved = nfceImportJpaRepository.findById(nfceImportId).orElseThrow();
-        org.assertj.core.api.Assertions.assertThat(saved.getStatus()).isEqualTo(NfceStatus.APPLIED);
+        assertThat(saved.getStatus()).isEqualTo(NfceStatus.APPLIED);
     }
 
     @Test
@@ -160,12 +166,11 @@ class NfceImportReviewFlowIT {
         UUID categoryId = createCategory("Laticínios");
         UUID productId = createProduct("Leite", categoryId);
 
-        // cria alias por EAN
         productAliasJpaRepository.save(
-                br.com.felipebrandao.stock.product.infrastructure.persistence.entity.ProductAliasEntity.builder()
+                ProductAliasEntity.builder()
                         .aliasNormalized("leite")
                         .ean("7890000000000")
-                        .product(br.com.felipebrandao.stock.product.infrastructure.persistence.entity.ProductEntity.builder()
+                        .product(ProductEntity.builder()
                                 .id(productId)
                                 .build())
                         .createdAt(java.time.OffsetDateTime.now())
@@ -234,28 +239,24 @@ class NfceImportReviewFlowIT {
     }
 
     private UUID seedCompletedImportWithScrape(String accessKey) {
-        // nfce_import
-        br.com.felipebrandao.stock.nfce.infrastructure.persistence.entity.NfceImportEntity imp =
-                br.com.felipebrandao.stock.nfce.infrastructure.persistence.entity.NfceImportEntity.builder()
+
+        NfceImportEntity imp = NfceImportEntity.builder()
                         .accessKey(accessKey)
                         .qrCodeUrl(accessKey)
-                        .status(NfceStatus.COMPLETED)
+                        .status(NfceStatus.PROCESSED)
                         .createdAt(java.time.OffsetDateTime.now())
                         .processedAt(java.time.OffsetDateTime.now())
                         .build();
         var savedImport = nfceImportJpaRepository.save(imp);
 
-        // scrape
-        br.com.felipebrandao.stock.nfce.infrastructure.persistence.entity.NfceScrapeEntity scrape =
-                br.com.felipebrandao.stock.nfce.infrastructure.persistence.entity.NfceScrapeEntity.builder()
+        NfceScrapeEntity scrape = NfceScrapeEntity.builder()
                         .accessKey(accessKey)
                         .uf("SP")
                         .fonte("TEST")
                         .scrapedAt(java.time.OffsetDateTime.now())
                         .build();
 
-        br.com.felipebrandao.stock.nfce.infrastructure.persistence.entity.NfceScrapeItemEntity scrapeItem =
-                br.com.felipebrandao.stock.nfce.infrastructure.persistence.entity.NfceScrapeItemEntity.builder()
+        NfceScrapeItemEntity scrapeItem = NfceScrapeItemEntity.builder()
                         .numero(1)
                         .descricao("Leite Italac")
                         .quantidade(new BigDecimal("1.000"))

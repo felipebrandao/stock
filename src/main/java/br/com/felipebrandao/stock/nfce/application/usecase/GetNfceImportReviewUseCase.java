@@ -2,6 +2,7 @@ package br.com.felipebrandao.stock.nfce.application.usecase;
 
 import br.com.felipebrandao.stock.nfce.domain.model.NfceImport;
 import br.com.felipebrandao.stock.nfce.domain.model.NfceImportItem;
+import br.com.felipebrandao.stock.nfce.domain.model.enums.NfceStatus;
 import br.com.felipebrandao.stock.nfce.domain.repository.NfceImportItemRepository;
 import br.com.felipebrandao.stock.nfce.domain.repository.NfceImportRepository;
 import br.com.felipebrandao.stock.shared.exception.BusinessException;
@@ -20,12 +21,10 @@ public class GetNfceImportReviewUseCase {
     private final BuildNfceImportReviewUseCase buildNfceImportReviewUseCase;
 
     public Result execute(UUID nfceImportId) {
-        // ensure it exists
         NfceImport nfceImport = nfceImportRepository.findById(nfceImportId)
                 .orElseThrow(() -> new BusinessException("Importação NFC-e não encontrada"));
 
-        // build items on demand after scraping completed
-        if (nfceImport.getStatus() == br.com.felipebrandao.stock.nfce.domain.model.enums.NfceStatus.COMPLETED) {
+        if (nfceImport.getStatus() == NfceStatus.PROCESSED) {
             buildNfceImportReviewUseCase.execute(nfceImportId);
         }
 

@@ -35,8 +35,8 @@ public class ApproveNfceImportUseCase {
         if (nfceImport.getStatus() == NfceStatus.APPLIED) {
             throw new BusinessException("Importação NFC-e já está APPLIED");
         }
-        if (nfceImport.getStatus() != NfceStatus.COMPLETED) {
-            throw new BusinessException("Importação NFC-e ainda não está COMPLETED");
+        if (nfceImport.getStatus() != NfceStatus.PROCESSED) {
+            throw new BusinessException("Importação NFC-e ainda não está PROCESSED");
         }
 
         List<NfceImportItem> items = itemRepository.findByNfceImportId(nfceImportId);

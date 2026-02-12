@@ -36,7 +36,7 @@ public class GetNfceHistoryUseCase {
         }
 
         long totalImported = nfceImportRepository.count();
-        long totalProcessed = nfceImportRepository.countByStatus(NfceStatus.COMPLETED)
+        long totalProcessed = nfceImportRepository.countByStatus(NfceStatus.PROCESSED)
                 + nfceImportRepository.countByStatus(NfceStatus.APPLIED);
         long totalPending = nfceImportRepository.countByStatus(NfceStatus.PENDING)
                 + nfceImportRepository.countByStatus(NfceStatus.PROCESSING);

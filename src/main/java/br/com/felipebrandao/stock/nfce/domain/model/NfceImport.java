@@ -40,7 +40,7 @@ public class NfceImport {
     }
 
     public void markCompleted() {
-        this.status = NfceStatus.COMPLETED;
+        this.status = NfceStatus.PROCESSED;
         this.updatedAt = Instant.now();
     }
 

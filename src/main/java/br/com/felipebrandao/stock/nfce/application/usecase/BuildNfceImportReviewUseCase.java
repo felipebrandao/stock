@@ -27,19 +27,15 @@ public class BuildNfceImportReviewUseCase {
     private final NfceScrapeJpaRepository scrapeJpaRepository;
     private final ProductAliasRepository productAliasRepository;
 
-    /**
-     * Creates reviewable items for a COMPLETED import, if they don't exist yet.
-     */
     @Transactional
     public void execute(UUID nfceImportId) {
         NfceImport nfceImport = nfceImportRepository.findById(nfceImportId)
                 .orElseThrow(() -> new BusinessException("Importação NFC-e não encontrada"));
 
-        if (nfceImport.getStatus() != NfceStatus.COMPLETED) {
-            throw new BusinessException("Importação NFC-e não está COMPLETED");
+        if (nfceImport.getStatus() != NfceStatus.PROCESSED) {
+            throw new BusinessException("Importação NFC-e não está PROCESSED");
         }
 
-        // idempotent: if already has items, do nothing
         if (!itemRepository.findByNfceImportId(nfceImportId).isEmpty()) {
             return;
         }
@@ -86,9 +82,6 @@ public class BuildNfceImportReviewUseCase {
         itemRepository.saveAll(items);
     }
 
-    /**
-     * Tiny adapter so we don't expose persistence classes in mapping logic.
-     */
     private record NfceImportItemEntityLike(
             Integer itemNumber,
             String description,
